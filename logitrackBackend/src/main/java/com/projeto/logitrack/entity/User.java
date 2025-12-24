@@ -16,13 +16,13 @@ public class User {
     private Integer id;
 
     @Column(name="user_name")
-    private Integer name;
+    private String name;
 
     @Column(name="user_email")
-    private Integer email;
+    private String email;
 
     @Column(name="user_password")
-    private Integer password;
+    private String password;
 
     @Column(name="user_logical_status")
     private LogicalStatus logicalStatus;
@@ -32,10 +32,10 @@ public class User {
     private List<StatusHistory> statusHistory;
 
     @ManyToOne
-    @JoinColumn(name="carrier_id")
+    @JoinColumn(name = "carrier_id", nullable = true)
     private Carrier carrier;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
     @JoinTable(name="user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name="role_id"))
@@ -44,7 +44,7 @@ public class User {
     public User() {
     }
 
-    public User(Integer id, Integer name, Integer email, Integer password, LogicalStatus logicalStatus, List<StatusHistory> statusHistory, Carrier carrier, List<Role> role) {
+    public User(Integer id, String name, String email, String password, LogicalStatus logicalStatus, List<StatusHistory> statusHistory, Carrier carrier, List<Role> role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -63,27 +63,27 @@ public class User {
         this.id = id;
     }
 
-    public Integer getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(Integer name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public Integer getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    public void setEmail(Integer email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public Integer getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(Integer password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 

@@ -36,15 +36,14 @@ public class Vehicle {
     private Carrier carrier;
 
     @PrePersist
-    public void statusVehiclePersist(){
-        if(this.statusVehicle == null){
+    public void prePersistSetup() {
+        // Define o status operacional padrão como Disponível
+        if (this.statusVehicle == null) {
             this.statusVehicle = StatusVehicle.AVAILABLE;
         }
-    }
 
-    @PrePersist
-    public void logicalStatusPersist(){
-        if(this.logicalStatus == null){
+        // Define o status lógico padrão como Ativo
+        if (this.logicalStatus == null) {
             this.logicalStatus = LogicalStatus.ACTIVE;
         }
     }
