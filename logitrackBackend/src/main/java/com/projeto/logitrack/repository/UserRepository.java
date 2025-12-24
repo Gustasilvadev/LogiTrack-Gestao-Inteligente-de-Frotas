@@ -14,8 +14,14 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
+    Optional<User> findByEmail(String email);
+
+    // Usado na autenticação e validação (Exclui deletados)
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.logicalStatus != :status")
+    Optional<User> findByEmail(String email, LogicalStatus status);
+
     @Query("SELECT u FROM User u WHERE u.carrier.id = :carrierId AND u.logicalStatus = :status")
-    List<User> findAllActiveByCarrier(Integer carrierId, LogicalStatus status);
+    List<User> findAllByCarrierId(Integer carrierId, LogicalStatus status);
 
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.logicalStatus != :status")
     Optional<User> findByIdActive(Integer id, LogicalStatus status);

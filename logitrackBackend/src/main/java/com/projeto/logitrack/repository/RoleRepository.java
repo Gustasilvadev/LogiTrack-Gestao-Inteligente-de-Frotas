@@ -3,6 +3,7 @@ package com.projeto.logitrack.repository;
 import com.projeto.logitrack.entity.Role;
 import com.projeto.logitrack.entity.User;
 import com.projeto.logitrack.enums.LogicalStatus;
+import com.projeto.logitrack.enums.RoleName;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,6 +15,8 @@ import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
+
+    Optional<Role> findByName(RoleName name);
 
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.logicalStatus != :status")
     Optional<User> findByEmailActive(String email, LogicalStatus status);

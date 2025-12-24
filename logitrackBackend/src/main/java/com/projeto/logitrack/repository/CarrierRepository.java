@@ -14,15 +14,18 @@ import java.util.Optional;
 @Repository
 public interface CarrierRepository extends JpaRepository<Carrier, Integer> {
 
-    // 1. FindAllAtivos
+    // FindAllAtivos
     @Query("SELECT c FROM Carrier c WHERE c.logicalStatus = :status")
     List<Carrier> findAllActive(LogicalStatus status);
 
-    // 2. FindById (Garante que não está deletado)
+    @Query("SELECT c FROM Carrier c WHERE c.cnpj = :cnpj AND c.logicalStatus != :status")
+    Optional<Carrier> findByCnpj(String cnpj, LogicalStatus status);
+
+    // FindById (Garante que não está deletado)
     @Query("SELECT c FROM Carrier c WHERE c.id = :id AND c.logicalStatus != :status")
     Optional<Carrier> findByIdActive(Integer id, LogicalStatus status);
 
-    // 3. SoftDelete
+    // SoftDelete
     @Transactional
     @Modifying
     @Query("UPDATE Carrier c SET c.logicalStatus = :status WHERE c.id = :id")
