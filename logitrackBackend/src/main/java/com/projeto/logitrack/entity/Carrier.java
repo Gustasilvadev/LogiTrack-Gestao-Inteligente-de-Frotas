@@ -31,7 +31,7 @@ public class Carrier {
     @PrePersist
     public void logicalStatusPersist(){
         if(this.logicalStatus == null){
-            this.logicalStatus = LogicalStatus.ACTIVE;
+            this.logicalStatus = LogicalStatus.ATIVO;
         }
     }
     public Carrier() {

@@ -39,12 +39,12 @@ public class Vehicle {
     public void prePersistSetup() {
         // Define o status operacional padrão como Disponível
         if (this.statusVehicle == null) {
-            this.statusVehicle = StatusVehicle.AVAILABLE;
+            this.statusVehicle = StatusVehicle.DISPONIVEL;
         }
 
         // Define o status lógico padrão como Ativo
         if (this.logicalStatus == null) {
-            this.logicalStatus = LogicalStatus.ACTIVE;
+            this.logicalStatus = LogicalStatus.ATIVO;
         }
     }
 

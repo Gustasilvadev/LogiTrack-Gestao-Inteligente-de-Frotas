@@ -17,8 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,19 +45,36 @@ public class UserService {
     }
 
     // --- AUTENTICAÇÃO ---
-
     public JwtTokenResponse authenticate(LoginUserRequest loginUserRequest) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginUserRequest.getEmail(), loginUserRequest.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
+
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        return new JwtTokenResponse(jwtTokenService.generateToken(userDetails));
+        // Gera o token
+        String token = jwtTokenService.generateToken(userDetails);
+
+        // Extrai o nome da Role (ex: "ADMIN", "MANAGER" ou "OPERADOR")
+        // Se o seu User tiver uma lista de roles, pegamos a primeira:
+        String roleName = userDetails.getUser().getRole().stream()
+                .findFirst()
+                .map(role -> role.getName().name()) // Isso retorna "ROLE_ADMIN"
+                .orElse("ROLE_OPERATOR");
+
+        String roleFinal = roleName.replace("ROLE_", "");
+
+        // Retorna o objeto completo com a Role
+        return new JwtTokenResponse(
+                token,
+                userDetails.getUser().getName(),
+                userDetails.getUser().getEmail(),
+                roleFinal
+        );
     }
 
     // --- CRIAÇÃO DE USUÁRIOS ---
-
     // 1. Criar Operador (Usado pelo GESTOR logado - Herda a Carrier automaticamente)
     public UserResponse createOperator(UserRequest request, User gestorLogado) {
         validateEmailUnique(request.getEmail());
@@ -76,7 +91,7 @@ public class UserService {
         validateEmailUnique(request.getEmail());
 
         // Atualizado para passar o status DELETED como filtro negativo
-        Carrier carrier = carrierRepository.findByCnpj(request.getCarrierCnpj(), LogicalStatus.DELETED)
+        Carrier carrier = carrierRepository.findByCnpj(request.getCarrierCnpj(), LogicalStatus.APAGADO)
                 .orElseThrow(() -> new RuntimeException("Transportadora não encontrada ou inativa com o CNPJ informado"));
 
         User user = prepareUserEntity(request);
@@ -94,7 +109,7 @@ public class UserService {
         user.setEmail(request.getEmail());
         // Criptografia da senha usando o PasswordEncoder configurado no Security
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setLogicalStatus(LogicalStatus.ACTIVE);
+        user.setLogicalStatus(LogicalStatus.ATIVO);
         return user;
     }
 
@@ -104,18 +119,18 @@ public class UserService {
     }
 
     private void validateEmailUnique(String email) {
-        if (userRepository.findByEmail(email, LogicalStatus.DELETED).isPresent()) {
+        if (userRepository.findByEmail(email, LogicalStatus.APAGADO).isPresent()) {
             throw new RuntimeException("E-mail já cadastrado no sistema.");
         }
     }
 
     public List<UserResponse> findAllActive(Integer carrierId) {
-        return userRepository.findAllByCarrierId(carrierId, LogicalStatus.ACTIVE)
+        return userRepository.findAllByCarrierId(carrierId, LogicalStatus.ATIVO)
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public void softDelete(Integer id) {
-        userRepository.softDelete(id, LogicalStatus.DELETED);
+        userRepository.softDelete(id, LogicalStatus.APAGADO);
     }
 
     private UserResponse mapToResponse(User u) {

@@ -20,12 +20,12 @@ public class CarrierService {
         Carrier carrier = new Carrier();
         carrier.setName(request.getName());
         carrier.setCnpj(request.getCnpj());
-        carrier.setLogicalStatus(LogicalStatus.ACTIVE);
+        carrier.setLogicalStatus(LogicalStatus.ATIVO);
         return mapToResponse(repository.save(carrier));
     }
 
     public CarrierResponse update(Integer id, CarrierRequest request) {
-        Carrier carrier = repository.findByIdActive(id, LogicalStatus.DELETED)
+        Carrier carrier = repository.findByIdActive(id, LogicalStatus.APAGADO)
                 .orElseThrow(() -> new RuntimeException("Transportadora não encontrada"));
         carrier.setName(request.getName());
         carrier.setCnpj(request.getCnpj());
@@ -33,17 +33,17 @@ public class CarrierService {
     }
 
     public List<CarrierResponse> findAllActive() {
-        return repository.findAllActive(LogicalStatus.ACTIVE)
+        return repository.findAllActive(LogicalStatus.ATIVO)
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public CarrierResponse findById(Integer id) {
-        return repository.findByIdActive(id, LogicalStatus.DELETED)
+        return repository.findByIdActive(id, LogicalStatus.APAGADO)
                 .map(this::mapToResponse).orElseThrow(() -> new RuntimeException("Não encontrado"));
     }
 
     public void softDelete(Integer id) {
-        repository.softDelete(id, LogicalStatus.DELETED);
+        repository.softDelete(id, LogicalStatus.APAGADO);
     }
 
     private CarrierResponse mapToResponse(Carrier c) {

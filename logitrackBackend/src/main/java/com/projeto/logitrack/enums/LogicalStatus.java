@@ -2,9 +2,9 @@ package com.projeto.logitrack.enums;
 
 public enum LogicalStatus {
 
-    DELETED(-1),
-    INACTIVE(0),
-    ACTIVE(1);
+    APAGADO(-1),
+    INATIVO(0),
+    ATIVO(1);
 
     private final Integer code;
 

@@ -16,7 +16,7 @@ public class StatusHistoryService {
     @Autowired private StatusHistoryRepository repository;
 
     public List<StatusHistoryResponse> findAllByCarrier(Integer carrierId) {
-        return repository.findAllActiveByCarrier(carrierId, LogicalStatus.ACTIVE)
+        return repository.findAllActiveByCarrier(carrierId, LogicalStatus.ATIVO)
                 .stream().map(h -> new StatusHistoryResponse(
                         h.getId(), h.getStatusVehiclePrevious(), h.getStatusVehicleNew(),
                         h.getDate(), h.getUser().getName(), h.getVehicle().getPlate()
@@ -24,7 +24,7 @@ public class StatusHistoryService {
     }
 
     public void softDelete(Integer id) {
-        repository.softDelete(id, LogicalStatus.DELETED);
+        repository.softDelete(id, LogicalStatus.APAGADO);
     }
 }
 

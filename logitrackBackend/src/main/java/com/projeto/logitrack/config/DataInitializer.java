@@ -60,7 +60,7 @@ public class DataInitializer implements CommandLineRunner {
         String adminEmail = "admin@logitrack.com";
 
         // Verifica se o admin já existe (considerando status lógico)
-        if (userRepository.findByEmail(adminEmail, LogicalStatus.DELETED).isEmpty()) {
+        if (userRepository.findByEmail(adminEmail, LogicalStatus.APAGADO).isEmpty()) {
             Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
                     .orElseThrow(() -> new RuntimeException("Erro: Role ADMIN não encontrada."));
 
@@ -68,7 +68,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setName("Administrador Geral");
             admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode("admin123"));
-            admin.setLogicalStatus(LogicalStatus.ACTIVE);
+            admin.setLogicalStatus(LogicalStatus.ATIVO);
 
             // Atribui a Role recuperada do banco
             admin.setRole(List.of(adminRole));

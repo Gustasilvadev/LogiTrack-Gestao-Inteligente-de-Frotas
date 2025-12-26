@@ -29,7 +29,7 @@ public class VehicleService {
         v.setDriverName(request.getDriverName());
         v.setStatusVehicle(request.getStatusVehicle());
         v.setCarrier(currentUser.getCarrier()); // Multi-tenancy
-        v.setLogicalStatus(LogicalStatus.ACTIVE);
+        v.setLogicalStatus(LogicalStatus.ATIVO);
         return mapToResponse(vehicleRepository.save(v));
     }
 
@@ -49,7 +49,7 @@ public class VehicleService {
             history.setStatusVehiclePrevious(statusAnterior);
             history.setStatusVehicleNew(novoStatus);
             history.setDate(LocalDate.now());
-            history.setLogicalStatus(LogicalStatus.ACTIVE);
+            history.setLogicalStatus(LogicalStatus.ATIVO);
 
             // Se sua tabela exige carrier_id no histórico:
             if (currentUser.getCarrier() != null) {
@@ -72,19 +72,19 @@ public class VehicleService {
     }
 
     public List<VehicleResponse> findAllActive(Integer carrierId) {
-        return vehicleRepository.findAllActiveByCarrier(carrierId, LogicalStatus.ACTIVE)
+        return vehicleRepository.findAllActiveByCarrier(carrierId, LogicalStatus.ATIVO)
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public VehicleResponse findById(Integer id, Integer carrierId) {
         // Garante que o usuário só veja veículos da própria transportadora
-        return vehicleRepository.findByIdActive(id, LogicalStatus.DELETED)
+        return vehicleRepository.findByIdActive(id, LogicalStatus.APAGADO)
                 .filter(v -> v.getCarrier().getId().equals(carrierId))
                 .map(this::mapToResponse).orElseThrow(() -> new RuntimeException("Acesso negado ou não encontrado"));
     }
 
     public void softDelete(Integer id) {
-        vehicleRepository.softDelete(id, LogicalStatus.DELETED);
+        vehicleRepository.softDelete(id, LogicalStatus.APAGADO);
     }
 
     private void createHistory(Vehicle v, StatusVehicle newStatus, User user) {
@@ -97,7 +97,7 @@ public class VehicleService {
         history.setVehicle(v);
         history.setUser(user);
         history.setCarrier(user.getCarrier());
-        history.setLogicalStatus(LogicalStatus.ACTIVE);
+        history.setLogicalStatus(LogicalStatus.ATIVO);
 
         statusHistoryRepository.save(history);
     }

@@ -2,9 +2,9 @@ package com.projeto.logitrack.enums;
 
 public enum StatusVehicle {
 
-    AVAILABLE(1),
-    IN_ROUTE(0),
-    MAINTENANCE(-1);
+    DISPONIVEL(1),
+    EM_ROTA(0),
+    MANUTENCAO(-1);
 
 
 

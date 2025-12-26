@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/history")
+@CrossOrigin("*")
 public class StatusHistoryController {
 
     @Autowired
