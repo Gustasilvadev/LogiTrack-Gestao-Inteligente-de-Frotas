@@ -10,14 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class VehicleService {
 
-    @Autowired private VehicleRepository repository;
-    @Autowired private StatusHistoryRepository historyRepository;
+    @Autowired private VehicleRepository vehicleRepository;
+    @Autowired private StatusHistoryRepository statusHistoryRepository;
 
     @Transactional
     public VehicleResponse create(VehicleRequest request, User currentUser) {
@@ -29,42 +30,61 @@ public class VehicleService {
         v.setStatusVehicle(request.getStatusVehicle());
         v.setCarrier(currentUser.getCarrier()); // Multi-tenancy
         v.setLogicalStatus(LogicalStatus.ACTIVE);
-        return mapToResponse(repository.save(v));
+        return mapToResponse(vehicleRepository.save(v));
     }
 
     @Transactional
-    public VehicleResponse updateStatus(Integer id, VehicleRequest request, User currentUser) {
-        Vehicle v = repository.findByIdActive(id, LogicalStatus.DELETED)
+    public VehicleResponse update(Integer id, VehicleRequest request, User currentUser) {
+        Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
 
-        // Guardamos o status atual antes de mudar para comparar
-        StatusVehicle statusNovo = request.getStatusVehicle();
+        // 1. Verifica se houve mudança de status para o histórico
+        StatusVehicle statusAnterior = vehicle.getStatusVehicle();
+        StatusVehicle novoStatus = request.getStatusVehicle();
 
-        if (!v.getStatusVehicle().equals(statusNovo)) {
-            // Chamada correta passando o Enum
-            createHistory(v, statusNovo, currentUser);
+        if (statusAnterior != novoStatus && novoStatus != null) {
+            StatusHistory history = new StatusHistory();
+            history.setVehicle(vehicle);
+            history.setUser(currentUser);
+            history.setStatusVehiclePrevious(statusAnterior);
+            history.setStatusVehicleNew(novoStatus);
+            history.setDate(LocalDate.now());
+            history.setLogicalStatus(LogicalStatus.ACTIVE);
+
+            // Se sua tabela exige carrier_id no histórico:
+            if (currentUser.getCarrier() != null) {
+                history.setCarrier(currentUser.getCarrier());
+            }
+
+            statusHistoryRepository.save(history);
+            vehicle.setStatusVehicle(novoStatus);
         }
 
-        v.setStatusVehicle(statusNovo);
-        v.setDriverName(request.getDriverName());
+        // 2. Atualiza os demais campos cadastrais
+        if (request.getPlate() != null) vehicle.setPlate(request.getPlate());
+        if (request.getModel() != null) vehicle.setModel(request.getModel());
+        if (request.getCapacity() != null) vehicle.setCapacity(request.getCapacity());
+        if (request.getDriverName() != null) vehicle.setDriverName(request.getDriverName());
 
-        return mapToResponse(repository.save(v));
+        vehicleRepository.save(vehicle);
+
+        return new VehicleResponse(vehicle);
     }
 
     public List<VehicleResponse> findAllActive(Integer carrierId) {
-        return repository.findAllActiveByCarrier(carrierId, LogicalStatus.ACTIVE)
+        return vehicleRepository.findAllActiveByCarrier(carrierId, LogicalStatus.ACTIVE)
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public VehicleResponse findById(Integer id, Integer carrierId) {
         // Garante que o usuário só veja veículos da própria transportadora
-        return repository.findByIdActive(id, LogicalStatus.DELETED)
+        return vehicleRepository.findByIdActive(id, LogicalStatus.DELETED)
                 .filter(v -> v.getCarrier().getId().equals(carrierId))
                 .map(this::mapToResponse).orElseThrow(() -> new RuntimeException("Acesso negado ou não encontrado"));
     }
 
     public void softDelete(Integer id) {
-        repository.softDelete(id, LogicalStatus.DELETED);
+        vehicleRepository.softDelete(id, LogicalStatus.DELETED);
     }
 
     private void createHistory(Vehicle v, StatusVehicle newStatus, User user) {
@@ -79,7 +99,7 @@ public class VehicleService {
         history.setCarrier(user.getCarrier());
         history.setLogicalStatus(LogicalStatus.ACTIVE);
 
-        historyRepository.save(history);
+        statusHistoryRepository.save(history);
     }
 
     private VehicleResponse mapToResponse(Vehicle v) {

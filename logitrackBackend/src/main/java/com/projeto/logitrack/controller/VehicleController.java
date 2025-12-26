@@ -42,7 +42,7 @@ public class VehicleController {
     public ResponseEntity<VehicleResponse> updateStatus(@PathVariable Integer id,
                                                         @RequestBody VehicleRequest request,
                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(vehicleService.updateStatus(id, request, userDetails.getUser()));
+        return ResponseEntity.ok(vehicleService.update(id, request, userDetails.getUser()));
     }
 
     @DeleteMapping("/deleteVehicleById/{id}")

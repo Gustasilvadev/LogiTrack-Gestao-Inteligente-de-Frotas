@@ -1,5 +1,6 @@
 package com.projeto.logitrack.dto.response;
 
+import com.projeto.logitrack.entity.Vehicle;
 import com.projeto.logitrack.enums.LogicalStatus;
 import com.projeto.logitrack.enums.StatusVehicle;
 
@@ -14,6 +15,16 @@ public class VehicleResponse {
     private LogicalStatus logicalStatus;
 
     public VehicleResponse() {}
+
+    public VehicleResponse(Vehicle vehicle) {
+        this.id = vehicle.getId();
+        this.plate = vehicle.getPlate();
+        this.model = vehicle.getModel();
+        this.capacity = vehicle.getCapacity();
+        this.driverName = vehicle.getDriverName();
+        this.statusVehicle = vehicle.getStatusVehicle();
+        this.logicalStatus = vehicle.getLogicalStatus();
+    }
 
     public VehicleResponse(Integer id, String plate, String model, String capacity, String driverName, StatusVehicle statusVehicle, LogicalStatus logicalStatus) {
         this.id = id;
