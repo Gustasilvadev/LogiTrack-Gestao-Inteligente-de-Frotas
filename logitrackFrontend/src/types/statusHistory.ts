@@ -1,10 +1,10 @@
 export type StatusVehicle = 'DISPONIVEL' | 'EM_ROTA' | 'MANUTENCAO';
 
-interface StatusHistoryResponse {
+export interface StatusHistoryResponse {
   id:number;
   historyPrevious:StatusVehicle;
   historyNew:StatusVehicle;
-  date:Date;
+  date: string;
   userName:string;
   vehiclePlate:string;
 }
