@@ -1,4 +1,3 @@
-// src/app/(dashboard)/layout.tsx
 import Sidebar from "@/src/components/layout/Sidebar";
 import { Box } from "@mui/material";
 
