@@ -62,10 +62,14 @@ public class SecurityConfiguration {
     public static final String[] ENDPOINTS_ADMIN = {
             "/api/carriers/createCarrier",
             "/api/carriers/listCarrier",
+            "/api/carriers/listCarrierActive",
             "/api/carriers/listCarrierById/**",
             "/api/carriers/updateCarrierById/**",
             "/api/carriers/deleteCarrierById/**",
-            "/api/users/createManager" // Admin cria o primeiro Gestor da transportadora
+            "/api/carriers/{id}/status",
+            "/api/users/listAllManagerOperators",
+            "/api/users/createManager",
+            "/api/users/{id}/status"
     };
 
     @Bean
@@ -81,7 +85,7 @@ public class SecurityConfiguration {
                         .requestMatchers(ENDPOINTS_OPERATOR).hasAnyRole("MANAGER", "OPERATOR")
                         .requestMatchers(ENDPOINTS_ADMIN).hasRole("ADMIN")
                         .requestMatchers(ENDPOINTS_AUTENTICADOS).authenticated()
-                        .anyRequest().authenticated()
+                        .anyRequest().denyAll()
                 )
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

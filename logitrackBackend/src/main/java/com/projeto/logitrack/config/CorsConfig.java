@@ -20,7 +20,7 @@ public class CorsConfig {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
 
         // Permite os métodos necessários
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
         // Permite todos os headers (essencial para o Authorization: Bearer token)
         configuration.setAllowedHeaders(Arrays.asList("*"));
