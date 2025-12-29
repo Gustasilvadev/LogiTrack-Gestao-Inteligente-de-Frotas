@@ -2,6 +2,7 @@ package com.projeto.logitrack.controller;
 
 import com.projeto.logitrack.dto.request.CarrierRequest;
 import com.projeto.logitrack.dto.response.CarrierResponse;
+import com.projeto.logitrack.enums.LogicalStatus;
 import com.projeto.logitrack.service.CarrierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,15 @@ public class CarrierController {
         return ResponseEntity.ok(carrierService.create(request));
     }
 
+    @GetMapping("/listCarrierActive")
+    public ResponseEntity<List<CarrierResponse>> listAllActives() {
+        return ResponseEntity.ok(carrierService.findAllActive());
+    }
+
     @GetMapping("/listCarrier")
     public ResponseEntity<List<CarrierResponse>> listAll() {
-        return ResponseEntity.ok(carrierService.findAllActive());
+        List<CarrierResponse> carriers = carrierService.listAllForAdmin();
+        return ResponseEntity.ok(carriers);
     }
 
     @GetMapping("/listCarrierById/{id}")
@@ -37,9 +44,12 @@ public class CarrierController {
         return ResponseEntity.ok(carrierService.update(id, request));
     }
 
-    @DeleteMapping("deleteCarrierById/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        carrierService.softDelete(id);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> changeStatus(
+            @PathVariable Integer id,
+            @RequestParam LogicalStatus status
+    ) {
+        carrierService.changeStatus(id, status);
+        return ResponseEntity.ok().build();
     }
 }

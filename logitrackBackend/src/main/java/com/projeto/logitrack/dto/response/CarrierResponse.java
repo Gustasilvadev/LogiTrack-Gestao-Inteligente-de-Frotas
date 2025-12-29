@@ -1,17 +1,15 @@
 package com.projeto.logitrack.dto.response;
 
-import com.projeto.logitrack.enums.LogicalStatus;
-
 public class CarrierResponse {
 
     private Integer id;
     private String name;
     private String cnpj;
-    private LogicalStatus logicalStatus;
+    private String logicalStatus;
 
     public CarrierResponse() {}
 
-    public CarrierResponse(Integer id, String name, String cnpj, LogicalStatus logicalStatus) {
+    public CarrierResponse(Integer id, String name, String cnpj, String logicalStatus) {
         this.id = id;
         this.name = name;
         this.cnpj = cnpj;
@@ -42,11 +40,11 @@ public class CarrierResponse {
         this.cnpj = cnpj;
     }
 
-    public LogicalStatus getLogicalStatus() {
+    public String getLogicalStatus() {
         return logicalStatus;
     }
 
-    public void setLogicalStatus(LogicalStatus logicalStatus) {
+    public void setLogicalStatus(String logicalStatus) {
         this.logicalStatus = logicalStatus;
     }
 }

@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 @Service
 public class CarrierService {
 
-    @Autowired private CarrierRepository repository;
+    @Autowired
+    private CarrierRepository repository;
 
     public CarrierResponse create(CarrierRequest request) {
         Carrier carrier = new Carrier();
@@ -32,6 +33,13 @@ public class CarrierService {
         return mapToResponse(repository.save(carrier));
     }
 
+    public List<CarrierResponse> listAllForAdmin() {
+        return repository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     public List<CarrierResponse> findAllActive() {
         return repository.findAllActive(LogicalStatus.ATIVO)
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
@@ -42,11 +50,19 @@ public class CarrierService {
                 .map(this::mapToResponse).orElseThrow(() -> new RuntimeException("Não encontrado"));
     }
 
-    public void softDelete(Integer id) {
-        repository.softDelete(id, LogicalStatus.APAGADO);
+    public void changeStatus(Integer id, LogicalStatus newStatus) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Transportadora não encontrado");
+        }
+        repository.updateStatus(id, newStatus);
     }
 
     private CarrierResponse mapToResponse(Carrier c) {
-        return new CarrierResponse(c.getId(), c.getName(), c.getCnpj(), c.getLogicalStatus());
+        return new CarrierResponse(
+                c.getId(),
+                c.getName(),
+                c.getCnpj(),
+                c.getLogicalStatus().name()
+        );
     }
 }
