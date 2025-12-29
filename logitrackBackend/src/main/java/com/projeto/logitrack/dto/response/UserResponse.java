@@ -7,15 +7,17 @@ public class UserResponse {
     private String email;
     private String roleName;
     private String carrierName;
+    private String logicalStatus;
 
     public UserResponse() {}
 
-    public UserResponse(Integer id, String name, String email, String roleName, String carrierName) {
+    public UserResponse(Integer id, String name, String email, String roleName, String carrierName, String logicalStatus) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.roleName = roleName;
         this.carrierName = carrierName;
+        this.logicalStatus = logicalStatus;
     }
 
     public Integer getId() {
@@ -56,5 +58,13 @@ public class UserResponse {
 
     public void setCarrierName(String carrierName) {
         this.carrierName = carrierName;
+    }
+
+    public String getLogicalStatus() {
+        return logicalStatus;
+    }
+
+    public void setLogicalStatus(String logicalStatus) {
+        this.logicalStatus = logicalStatus;
     }
 }

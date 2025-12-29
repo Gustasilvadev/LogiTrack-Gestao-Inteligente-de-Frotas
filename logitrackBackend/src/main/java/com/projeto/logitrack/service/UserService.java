@@ -124,18 +124,38 @@ public class UserService {
         }
     }
 
-    public List<UserResponse> findAllActive(Integer carrierId) {
-        return userRepository.findAllByCarrierId(carrierId, LogicalStatus.ATIVO)
-                .stream().map(this::mapToResponse).collect(Collectors.toList());
+    public List<UserResponse> listOperatorsForManager(Integer carrierId) {
+        return userRepository.findByCarrierAndRole(carrierId, RoleName.ROLE_OPERATOR, LogicalStatus.ATIVO)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
-    public void softDelete(Integer id) {
-        userRepository.softDelete(id, LogicalStatus.APAGADO);
+    public List<UserResponse> listAllForAdmin() {
+        return userRepository.findAllManagersAndOperators()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public void changeStatus(Integer id, LogicalStatus newStatus) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+        userRepository.updateStatus(id, newStatus);
     }
 
     private UserResponse mapToResponse(User u) {
         String roleStr = u.getRole().isEmpty() ? "N/A" : u.getRole().get(0).getName().name();
-        return new UserResponse(u.getId(), u.getName(), u.getEmail(),
-                roleStr, u.getCarrier().getName());
+        String carrierName = (u.getCarrier() != null) ? u.getCarrier().getName() : "LogiTrack Sistema";
+
+        return new UserResponse(
+                u.getId(),
+                u.getName(),
+                u.getEmail(),
+                roleStr,
+                carrierName,
+                u.getLogicalStatus().name()
+        );
     }
 }

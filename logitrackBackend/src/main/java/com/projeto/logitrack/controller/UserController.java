@@ -4,6 +4,7 @@ import com.projeto.logitrack.dto.request.LoginUserRequest;
 import com.projeto.logitrack.dto.request.UserRequest;
 import com.projeto.logitrack.dto.response.JwtTokenResponse;
 import com.projeto.logitrack.dto.response.UserResponse;
+import com.projeto.logitrack.enums.LogicalStatus;
 import com.projeto.logitrack.service.UserService;
 import com.projeto.logitrack.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +39,25 @@ public class UserController {
         return ResponseEntity.ok(userService.createOperator(request, userDetails.getUser()));
     }
 
+    // Endpoint: GESTOR lista seu time
     @GetMapping("/listTeam")
-    public ResponseEntity<List<UserResponse>> listAll(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(userService.findAllActive(userDetails.getUser().getCarrier().getId()));
+    public ResponseEntity<List<UserResponse>> listTeam(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Integer carrierId = userDetails.getUser().getCarrier().getId();
+        return ResponseEntity.ok(userService.listOperatorsForManager(carrierId));
     }
 
-    @DeleteMapping("/deleteUserById/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        userService.softDelete(id);
-        return ResponseEntity.noContent().build();
+    // Endpoint: ADMIN lista todos os usuários do sistema
+    @GetMapping("/listAllManagerOperators")
+    public ResponseEntity<List<UserResponse>> listAll() {
+        return ResponseEntity.ok(userService.listAllForAdmin());
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> changeStatus(
+            @PathVariable Integer id,
+            @RequestParam LogicalStatus status
+    ) {
+        userService.changeStatus(id, status);
+        return ResponseEntity.ok().build();
     }
 }
