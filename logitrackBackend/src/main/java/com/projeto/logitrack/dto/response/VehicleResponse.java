@@ -1,7 +1,6 @@
 package com.projeto.logitrack.dto.response;
 
 import com.projeto.logitrack.entity.Vehicle;
-import com.projeto.logitrack.enums.LogicalStatus;
 import com.projeto.logitrack.enums.StatusVehicle;
 
 public class VehicleResponse {
@@ -11,8 +10,8 @@ public class VehicleResponse {
     private String model;
     private String capacity;
     private String driverName;
-    private StatusVehicle statusVehicle;
-    private LogicalStatus logicalStatus;
+    private String statusVehicle;
+    private String logicalStatus;
 
     public VehicleResponse() {}
 
@@ -22,11 +21,19 @@ public class VehicleResponse {
         this.model = vehicle.getModel();
         this.capacity = vehicle.getCapacity();
         this.driverName = vehicle.getDriverName();
-        this.statusVehicle = vehicle.getStatusVehicle();
-        this.logicalStatus = vehicle.getLogicalStatus();
+
+        // Tratamento para StatusVehicle (Enum -> String)
+        this.statusVehicle = (vehicle.getStatusVehicle() != null)
+                ? vehicle.getStatusVehicle().name()
+                : "DISPONIVEL";
+
+        // Tratamento para LogicalStatus (Enum -> String)
+        this.logicalStatus = (vehicle.getLogicalStatus() != null)
+                ? vehicle.getLogicalStatus().name()
+                : "INATIVO";
     }
 
-    public VehicleResponse(Integer id, String plate, String model, String capacity, String driverName, StatusVehicle statusVehicle, LogicalStatus logicalStatus) {
+    public VehicleResponse(Integer id, String plate, String model, String capacity, String driverName, String statusVehicle, String logicalStatus) {
         this.id = id;
         this.plate = plate;
         this.model = model;
@@ -76,19 +83,19 @@ public class VehicleResponse {
         this.driverName = driverName;
     }
 
-    public StatusVehicle getStatusVehicle() {
+    public String getStatusVehicle() {
         return statusVehicle;
     }
 
-    public void setStatusVehicle(StatusVehicle statusVehicle) {
+    public void setStatusVehicle(String statusVehicle) {
         this.statusVehicle = statusVehicle;
     }
 
-    public LogicalStatus getLogicalStatus() {
+    public String getLogicalStatus() {
         return logicalStatus;
     }
 
-    public void setLogicalStatus(LogicalStatus logicalStatus) {
+    public void setLogicalStatus(String logicalStatus) {
         this.logicalStatus = logicalStatus;
     }
 }

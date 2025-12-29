@@ -83,8 +83,11 @@ public class VehicleService {
                 .map(this::mapToResponse).orElseThrow(() -> new RuntimeException("Acesso negado ou não encontrado"));
     }
 
-    public void softDelete(Integer id) {
-        vehicleRepository.softDelete(id, LogicalStatus.APAGADO);
+    public void changeStatus(Integer id, LogicalStatus newStatus) {
+        if (!vehicleRepository.existsById(id)) {
+            throw new RuntimeException("Veiculo não encontrado");
+        }
+        vehicleRepository.updateStatus(id, newStatus);
     }
 
     private void createHistory(Vehicle v, StatusVehicle newStatus, User user) {
@@ -103,7 +106,14 @@ public class VehicleService {
     }
 
     private VehicleResponse mapToResponse(Vehicle v) {
-        return new VehicleResponse(v.getId(), v.getPlate(), v.getModel(), v.getCapacity(),
-                v.getDriverName(), v.getStatusVehicle(), v.getLogicalStatus());
+        return new VehicleResponse(
+                v.getId(),
+                v.getPlate(),
+                v.getModel(),
+                v.getCapacity(),
+                v.getDriverName(),
+                v.getStatusVehicle() != null ? v.getStatusVehicle().name() : "DISPONIVEL",
+                v.getLogicalStatus() != null ? v.getLogicalStatus().name() : "ATIVO"
+        );
     }
 }

@@ -2,6 +2,7 @@ package com.projeto.logitrack.controller;
 
 import com.projeto.logitrack.dto.request.VehicleRequest;
 import com.projeto.logitrack.dto.response.VehicleResponse;
+import com.projeto.logitrack.enums.LogicalStatus;
 import com.projeto.logitrack.service.VehicleService;
 import com.projeto.logitrack.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +47,12 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleService.update(id, request, userDetails.getUser()));
     }
 
-    @DeleteMapping("/deleteVehicleById/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        vehicleService.softDelete(id);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> changeStatus(
+            @PathVariable Integer id,
+            @RequestParam LogicalStatus status
+    ) {
+        vehicleService.changeStatus(id, status);
+        return ResponseEntity.ok().build();
     }
 }
