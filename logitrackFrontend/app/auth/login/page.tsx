@@ -33,7 +33,7 @@ export default function LoginPage() {
       // 3. Lógica  de Redirecionamento
       // SE for o email específico E for ADMIN -> Vai para o Painel Administrativo
       if (response.email === 'admin@logitrack.com' && response.roleName === 'ADMIN') {
-        router.push('/dashboardAdmin/dash');
+        router.push('/dashboardAdmin/dashCarriers');
       } else if (response.roleName === 'MANAGER' || response.roleName === 'OPERADOR') {
         router.push('/dashboard/home');
       }

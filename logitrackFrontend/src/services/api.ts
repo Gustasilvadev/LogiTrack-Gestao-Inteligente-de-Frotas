@@ -6,7 +6,7 @@ const api = axios.create({
 
 // Interceptor para injetar o Token em cada requisição
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('logitrack_token'); // Ou use cookies
+  const token = localStorage.getItem('@LogiTrack:token');
   
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

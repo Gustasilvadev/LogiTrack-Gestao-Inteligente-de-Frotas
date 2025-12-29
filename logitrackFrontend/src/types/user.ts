@@ -1,4 +1,5 @@
 export type RoleName = 'ADMIN' | 'MANAGER' | 'OPERADOR';
+export type LogicalStatus = 'APAGADO' | 'INATIVO' | 'ATIVO';
 
 export interface UserRequest {
   name:string;
@@ -14,4 +15,6 @@ export interface UserResponse {
   email: string;
   roleName:string;
   carrierName:string;
+  logicalStatus:LogicalStatus;
+
 }

@@ -22,7 +22,7 @@ export const vehicleService = {
   },
 
   // PUT /api/vehicles/updateVehicleStatusById/{id}
-  updateStatus: async (id: number, status: StatusVehicle): Promise<VehicleResponse> => {
+  updateStatusVehicle: async (id: number, status: StatusVehicle): Promise<VehicleResponse> => {
     const { data } = await api.put<VehicleResponse>(`/api/vehicles/updateVehicleStatusById/${id}`, { status });
     return data;
   },
@@ -30,5 +30,9 @@ export const vehicleService = {
   // DELETE /api/vehicles/deleteVehicleById/{id}
   delete: async (id: number): Promise<void> => {
     await api.delete(`/api/vehicles/deleteVehicleById/${id}`);
+  },
+  //Patch /api/carriers/{id}/status
+  updateStatusLogical: async (id: number, status: string): Promise<void> => {
+    await api.patch(`/api/users/${id}/status?status=${status}`);
   }
 };
