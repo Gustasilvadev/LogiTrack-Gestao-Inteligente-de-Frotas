@@ -1,6 +1,5 @@
 import ProtectedRoute from "@/src/components/auth/ProtectedRoute";
 import { AppBar, Box, CssBaseline, IconButton, Toolbar, Typography } from "@mui/material";
-
 import MenuListComposition from "@/src/components/menuList/MenuList";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

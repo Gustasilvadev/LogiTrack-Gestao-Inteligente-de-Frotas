@@ -1,16 +1,33 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Chip, Paper, Snackbar, Stack, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { carrierService } from "@/src/services/carrierService/carrierService";
 import { CarrierResponse } from "@/src/types/carrier";
+import CreateCarrierModal from "@/src/components/forms/CreateCarrierModal";
 
 export default function AdminPageCarriers() {
   const [rows, setRows] = useState<CarrierResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 1. Função para carregar os dados (reutilizável)
+  const [toast, setToast] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
+
+  const handleSuccess = () => {
+    fetchCarriers();
+    setToast({
+      open: true,
+      message: "Transportadora cadastrada com sucesso!",
+      severity: "success",
+    });
+  };
+
+  // Função para carregar os dados
   const fetchCarriers = useCallback(async () => {
     try {
       setLoading(true);
@@ -27,15 +44,14 @@ export default function AdminPageCarriers() {
     fetchCarriers();
   }, [fetchCarriers]);
 
-  // 2. Definição das colunas usando useMemo para performance e acesso ao fetchCarriers
   const columns = useMemo<GridColDef<CarrierResponse>[]>(() => [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'name', headerName: 'NOME', flex: 1 },
-    { field: 'cnpj', headerName: 'CNPJ', width: 200 },
+    { field: 'id', headerName: 'ID', width: 250, align: 'center', headerAlign: 'center' },
+    { field: 'name', headerName: 'NOME', width: 350, align: 'center', headerAlign: 'center' },
+    { field: 'cnpj', headerName: 'CNPJ', width: 350, align: 'center', headerAlign: 'center'  },
     {
       field: 'logicalStatus',
       headerName: 'STATUS',
-      width: 120,
+      width: 350,
       align: 'center',
       headerAlign: 'center',
       renderCell: (params: GridRenderCellParams<CarrierResponse, string>) => {
@@ -57,7 +73,7 @@ export default function AdminPageCarriers() {
     {
       field: 'actions',
       headerName: 'AÇÕES',
-      width: 320,
+      width: 350,
       sortable: false,
       align: 'center',
       headerAlign: 'center',
@@ -65,7 +81,7 @@ export default function AdminPageCarriers() {
         const handleStatusChange = async (newStatus: string) => {
           try {
             await carrierService.updateStatusLogical(params.row.id, newStatus);
-            fetchCarriers(); // Atualiza a lista sem recarregar a página
+            fetchCarriers();
           } catch (error) {
             console.error("Erro ao atualizar status:", error);
             alert("Não foi possível atualizar o status.");
@@ -77,21 +93,21 @@ export default function AdminPageCarriers() {
             <Button 
               variant="outlined" size="medium" color="success"
               onClick={() => handleStatusChange('ATIVO')}
-              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold' }}
+              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"green", color:"white"} }}
             >
               Ativar
             </Button>
             <Button 
               variant="outlined" size="medium" color="warning"
               onClick={() => handleStatusChange('INATIVO')}
-              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold' }}
+              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"orange", color:"white"} }}
             >
               Inativar
             </Button>
             <Button 
               variant="outlined" size="medium" color="error"
               onClick={() => handleStatusChange('APAGADO')}
-              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold' }}
+              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"red", color:"white"} }}
             >
               Apagar
             </Button>
@@ -103,10 +119,31 @@ export default function AdminPageCarriers() {
 
   return (
     <Box sx={{ width: '100%', p: 2 }}>
-      <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
-        Gestão de Transportadoras
-      </Typography>
-      
+      <Stack 
+        direction="row" 
+        justifyContent="space-between" 
+        alignItems="center" 
+        sx={{ mb: 3 }}
+      >
+        <Typography variant="h5" sx={{ fontWeight: 'bold', m: 0 }}>
+          Gestão de Transportadoras
+        </Typography>
+
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={() => setIsModalOpen(true)} 
+          sx={{ 
+            borderRadius: 0, 
+            fontWeight: 'bold', 
+            px: 4, 
+            py: 1.2
+          }}
+        >
+          CRIAR TRANSPORTADORA
+        </Button>
+      </Stack>
+
       <Paper 
         sx={{ 
           height: 600, 
@@ -117,6 +154,25 @@ export default function AdminPageCarriers() {
           overflow: 'hidden'
         }}
       >
+        {/* COMPONENTE DO MODAL */}
+        <CreateCarrierModal 
+        open={isModalOpen} 
+        handleClose={() => setIsModalOpen(false)} 
+        onSuccess={handleSuccess} 
+      />
+
+      {/* TOAST */}
+      <Snackbar 
+        open={toast.open} 
+        autoHideDuration={4000} 
+        onClose={() => setToast({ ...toast, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert variant="filled" severity={toast.severity} sx={{ borderRadius: 0 }}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
+      
         <DataGrid
           rows={rows}
           columns={columns}

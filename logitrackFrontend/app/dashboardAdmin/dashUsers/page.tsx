@@ -1,41 +1,61 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Box, Chip, Paper, Typography, Stack, Button } from "@mui/material";
+import { Box, Chip, Paper, Typography, Stack, Button, Snackbar, Alert } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { userService } from "@/src/services/userService/userService";
 import { UserResponse } from "@/src/types/user";
+import CreateUserModal from "@/src/components/forms/CreateUserModal";
 
 export default function AdminPageUsers() {
   const [rows, setRows] = useState<UserResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [toast, setToast] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
+
+  const handleSuccess = () => {
+    fetchUsers();
+    setToast({
+      open: true,
+      message: "Usuário cadastrado com sucesso!",
+      severity: "success",
+    });
+  };
 
   const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await userService.listAllManagerOperators();
-      setRows(data);
-    } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-    } finally {
-      setLoading(false);
-    }
+      try {
+        setLoading(true);
+        const data = await userService.listAllManagerOperators();
+        setRows(data);
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+      } finally {
+        setLoading(false);
+      }
   }, []);
+
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
   const columns: GridColDef<UserResponse>[] = [
-    { field: 'id', headerName: 'ID', width: 80 },
-    { field: 'name', headerName: 'NOME', flex: 1, minWidth: 100 },
-    { field: 'email', headerName: 'EMAIL', flex: 1, minWidth: 200 },
+    { field: 'id', headerName: 'ID', width: 80, align: 'center', headerAlign: 'center' },
+    { field: 'name', headerName: 'NOME', flex: 1, minWidth: 100, align: 'center',headerAlign: 'center'},
+    { field: 'email', headerName: 'EMAIL', flex: 1, minWidth: 200, align: 'center', headerAlign: 'center'},
     { 
       field: 'roleName', 
       headerName: 'CARGO', 
-      width: 150,
+      width: 200,
+      align: 'center',
+      headerAlign: 'center',
       renderCell: (params) => (
-        <Typography sx={{ fontSize: '0.875rem' }}>
+        <Typography sx={{ fontSize: '0.9rem' }}>
           {params.value?.replace('ROLE_', '')}
         </Typography>
       )
@@ -44,7 +64,7 @@ export default function AdminPageUsers() {
     {
       field: 'logicalStatus',
       headerName: 'STATUS',
-      width: 120,
+      width: 120, 
       align: 'center',
       headerAlign: 'center',
       renderCell: (params: GridRenderCellParams<UserResponse, string>) => {
@@ -86,21 +106,21 @@ export default function AdminPageUsers() {
             <Button 
               variant="outlined" size="medium" color="success"
               onClick={() => onStatusChange('ATIVO')}
-              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold' }}
+              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"green", color:"white"} }}
             >
               Ativar
             </Button>
             <Button 
               variant="outlined" size="medium" color="warning"
               onClick={() => onStatusChange('INATIVO')}
-              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold' }}
+              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"orange", color:"white"} }}
             >
               Inativar
             </Button>
             <Button 
               variant="outlined" size="medium" color="error"
               onClick={() => onStatusChange('APAGADO')}
-              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold' }}
+              sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"red", color:"white"} }}
             >
               Apagar
             </Button>
@@ -111,35 +131,40 @@ export default function AdminPageUsers() {
   ];
 
   return (
-    <Box sx={{ width: '100%', p: 2 }}>
-      <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
-        Gestão de Usuários
-      </Typography>
-      
-      <Paper sx={{ height: 600, width: '100%', borderRadius: 0, boxShadow: 'none', border: '1px solid #e0e0e0', overflow: 'hidden' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          initialState={{
-            pagination: { paginationModel: { page: 0, pageSize: 10 } },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          disableRowSelectionOnClick
-          getRowId={(row) => row.id} 
-          sx={{
-            border: 0,
-            '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: '#f8f9fa',
-              borderBottom: '2px solid #e0e0e0',
-              textTransform: 'uppercase',
-              fontSize: '0.75rem',
-              fontWeight: 'bold',
-            },
-            '& .MuiDataGrid-cell:focus': { outline: 'none' },
-          }}
+      <Box sx={{ width: '100%', p: 2 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Gestão de Usuários</Typography>
+          <Button sx={{ width:200,borderRadius: 0, }} variant="contained" onClick={() => setIsModalOpen(true)}>CRIAR USUÁRIO</Button>
+        </Stack>
+
+        {/* Tabela */}
+        <Paper sx={{ height: 600, width: '100%', borderRadius: 0, border: '1px solid #e0e0e0', overflow: 'hidden' }}>
+          <DataGrid rows={rows} columns={columns} loading={loading} getRowId={(row) => row.id} />
+        </Paper>
+
+        {/* Modal */}
+        <CreateUserModal 
+          open={isModalOpen} 
+          handleClose={() => setIsModalOpen(false)} 
+          onSuccess={handleSuccess} 
         />
-      </Paper>
-    </Box>
+
+        {/* TOAST */}
+        <Snackbar 
+          open={toast.open} 
+          autoHideDuration={4000} 
+          onClose={() => setToast({ ...toast, open: false })}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert 
+            onClose={() => setToast({ ...toast, open: false })} 
+            severity={toast.severity} 
+            variant="filled" 
+            sx={{ width: '100%', borderRadius: 0 }}
+          >
+            {toast.message}
+          </Alert>
+        </Snackbar>
+      </Box>
   );
 }

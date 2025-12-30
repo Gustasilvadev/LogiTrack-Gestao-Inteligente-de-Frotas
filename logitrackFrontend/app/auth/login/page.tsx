@@ -129,15 +129,6 @@ export default function LoginPage() {
                   </Grid>
                 </Grid>
               </form>
-
-              <Box sx={{ mt: 3, textAlign: 'center' }}>
-                <Typography variant="body2">
-                  Não possui o cadastro?{' '}
-                  <Link href="/auth/register" sx={{ fontWeight: 'bold', color: '#1A237E', textDecoration: 'none', cursor: 'pointer' }}>
-                    Fazer Cadastro
-                  </Link>
-                </Typography>
-              </Box>
             </Grid>
 
             {/* --- LADO DIREITO: IMAGEM --- */}
@@ -148,8 +139,8 @@ export default function LoginPage() {
                 position: 'relative',
                 backgroundImage: 'url("/BannerLogin.png")',
                 backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                minHeight: '600px',
+                backgroundPosition: 'center 15%',
+                minHeight: '700px',
                 '&::after': {
                   content: '""',
                   position: 'absolute',

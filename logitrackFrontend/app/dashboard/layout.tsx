@@ -1,13 +1,9 @@
-import Sidebar from "@/src/components/layout/Sidebar";
-import { Box } from "@mui/material";
+import ResponsiveDrawer from "@/src/components/layout/ResponsiveDrawer";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Box>
-      <Sidebar />
-      <Box component="main" sx={{ p: 3 }}>
-        {children}
-      </Box>
-    </Box>
+    <ResponsiveDrawer>
+      {children}
+    </ResponsiveDrawer>
   );
 }
