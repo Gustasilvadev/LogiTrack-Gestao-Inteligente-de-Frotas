@@ -57,12 +57,18 @@ public class CarrierService {
         repository.updateStatus(id, newStatus);
     }
 
-    private CarrierResponse mapToResponse(Carrier c) {
+    public CarrierResponse mapToResponse(Carrier c) {
+        if (c == null) return null;
+
+        String statusStr = (c.getLogicalStatus() != null)
+                ? c.getLogicalStatus().name()
+                : "ATIVO";
+
         return new CarrierResponse(
                 c.getId(),
                 c.getName(),
                 c.getCnpj(),
-                c.getLogicalStatus().name()
+                statusStr
         );
     }
 }
