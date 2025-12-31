@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
     @Autowired
@@ -35,6 +37,11 @@ public class SecurityConfiguration {
             "/api/users/loginUser"
     };
 
+    public static final String[] ENDPOINTS_COMPARTILHADOS = {
+            "/api/users/{id}/status",
+            "/api/carriers/{id}/status",
+            "/api/users/update/{id}"
+    };
 
     public static final String[] ENDPOINTS_MANAGER = {
             "/api/users/createOperator",
@@ -42,7 +49,8 @@ public class SecurityConfiguration {
             "/api/users/deleteUserById/**",
             "/api/vehicles/createVehicle",
             "/api/vehicles/deleteVehicleById/**",
-            "/api/history/deleteHistoryById/**"
+            "/api/history/deleteHistoryById/**",
+
     };
 
     // Endpoints que requerem autenticação básica
@@ -55,7 +63,8 @@ public class SecurityConfiguration {
             "/api/vehicles/listVehicles",
             "/api/vehicles/listVehicleById/**",
             "/api/vehicles/updateVehicleStatusById/**", // Operador move o caminhão
-            "/api/history/listHistoryByCarrier"
+            "/api/history/listHistoryByCarrier",
+            "/api/carriers/myCarrier"
     };
 
     // Endpoints exclusivos para administradores
@@ -66,10 +75,8 @@ public class SecurityConfiguration {
             "/api/carriers/listCarrierById/**",
             "/api/carriers/updateCarrierById/**",
             "/api/carriers/deleteCarrierById/**",
-            "/api/carriers/{id}/status",
             "/api/users/listAllManagerOperators",
             "/api/users/createManager",
-            "/api/users/{id}/status"
     };
 
     @Bean
@@ -81,6 +88,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
                         .requestMatchers(ENDPOINTS_SEM_AUTENTICACAO).permitAll()
+                        .requestMatchers(ENDPOINTS_COMPARTILHADOS).hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers(ENDPOINTS_MANAGER).hasRole("MANAGER")
                         .requestMatchers(ENDPOINTS_OPERATOR).hasAnyRole("MANAGER", "OPERATOR")
                         .requestMatchers(ENDPOINTS_ADMIN).hasRole("ADMIN")
