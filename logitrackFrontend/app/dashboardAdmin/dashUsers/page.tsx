@@ -53,6 +53,7 @@ export default function AdminPageUsers() {
       headerName: 'CARGO', 
       width: 200,
       align: 'center',
+      display: 'flex',
       headerAlign: 'center',
       renderCell: (params) => (
         <Typography sx={{ fontSize: '0.9rem' }}>

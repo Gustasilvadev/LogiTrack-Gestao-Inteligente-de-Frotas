@@ -41,5 +41,11 @@ export const carrierService ={
   //Patch /api/carriers/{id}/status
   updateStatusLogical: async (id: number, status: string): Promise<void> => {
     await api.patch(`/api/carriers/${id}/status?status=${status}`);
-  }
+  },
+
+  // GET /api/carriers/myCarrier
+  getMyCarrier: async (): Promise<CarrierResponse> => {
+    const { data } = await api.get<CarrierResponse>(`/api/carriers/myCarrier`);
+    return data;
+  },
 };

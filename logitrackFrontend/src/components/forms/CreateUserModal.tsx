@@ -40,7 +40,7 @@ interface CreateUserModalProps {
         email: '', 
         password: '', 
         carrierCnpj: '', 
-        roleName: 'MANAGER' 
+        roleName: 'ROLE_MANAGER' 
     };
 
     const [formData, setFormData] = useState<UserRequest>(initialForm);
@@ -53,7 +53,7 @@ interface CreateUserModalProps {
             setError(null);
             const payload = {
             ...formData,
-            roleName: `ROLE_${formData.roleName}` as any
+                roleName: formData.roleName 
             };
 
             await userService.createManager(payload);
@@ -106,7 +106,7 @@ interface CreateUserModalProps {
                 {/* CAMPO DE ROLE */}
                 <TextField
                     fullWidth label="Cargo" size="small"
-                    value="GERENTE (MANAGER)"
+                    value="GERENTE"
                     disabled // O Admin não pode mudar
                 />
 

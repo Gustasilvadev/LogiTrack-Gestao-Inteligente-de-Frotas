@@ -13,7 +13,6 @@ const menuItems = [
   { text: 'Transportadora', icon: <BusinessIcon />, path: '/dashboard/carrier' },
   { text: 'Veículos', icon: <LocalShippingIcon />, path: '/dashboard/vehicle' },
   { text: 'Histórico', icon: <HistoryIcon />, path: '/dashboard/historyStatus' },
-  { text: 'Sair', icon: <LogoutIcon />, path: '/auth/login' },
 ];
 
 export default function ResponsiveDrawer({ children }: { children: React.ReactNode }) {
@@ -75,7 +74,7 @@ export default function ResponsiveDrawer({ children }: { children: React.ReactNo
       
       <Box sx={{ position: 'absolute', bottom: 0, width: '100%', p: 1 }}>
         <Divider sx={{ mb: 1 }} />
-        <ListItemButton onClick={() => router.push('/login')} sx={{ borderRadius: '8px' }}>
+        <ListItemButton onClick={() => router.push('/auth/login')} sx={{ borderRadius: '8px' }}>
           <ListItemIcon sx={{ minWidth: 40 }}><LogoutIcon color="error" /></ListItemIcon>
           <ListItemText primary="Sair" sx={{ color: 'error.main' }} />
         </ListItemButton>

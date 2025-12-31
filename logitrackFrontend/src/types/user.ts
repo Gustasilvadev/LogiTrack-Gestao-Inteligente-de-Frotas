@@ -1,4 +1,4 @@
-export type RoleName = 'ADMIN' | 'MANAGER' | 'OPERADOR';
+export type RoleName = 'ROLE_ADMIN' | 'ROLE_MANAGER' | 'ROLE_OPERATOR';
 export type LogicalStatus = 'APAGADO' | 'INATIVO' | 'ATIVO';
 
 export interface UserRequest {

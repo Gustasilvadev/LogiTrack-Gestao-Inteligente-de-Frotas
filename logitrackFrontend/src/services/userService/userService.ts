@@ -41,8 +41,14 @@ export const userService = {
     await api.delete(`/api/users/deleteUserById/${id}`);
   },
 
-  //Patch /api/carriers/{id}/status
+  // Patch /api/users/{id}/status
   updateStatusLogical: async (id: number, status: string): Promise<void> => {
     await api.patch(`/api/users/${id}/status?status=${status}`);
-  }
+  },
+
+  // PUT /api/users/update/{id}
+  updateUser: async (id: number, userData: UserRequest): Promise<UserResponse> => {
+    const { data } = await api.put<UserResponse>(`/api/users/update/${id}`, userData);
+    return data;
+  },
 };
