@@ -12,6 +12,7 @@ import com.projeto.logitrack.enums.RoleName;
 import com.projeto.logitrack.repository.CarrierRepository;
 import com.projeto.logitrack.repository.RoleRepository;
 import com.projeto.logitrack.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -101,7 +102,27 @@ public class UserService {
         return mapToResponse(userRepository.save(user));
     }
 
-    // --- MÉTODOS AUXILIARES E CRUD ---
+    @Transactional
+    public UserResponse updateUser(Integer id, UserRequest request, User loggedUser) {
+        // 1. Busca o usuário que será editado
+        User userToUpdate = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+
+        // 2. VALIDAÇÃO DE SEGURANÇA: O gestor logado é da mesma transportadora?
+        if (!userToUpdate.getCarrier().getId().equals(loggedUser.getCarrier().getId())) {
+            throw new RuntimeException("Você não tem permissão para editar usuários de outra transportadora.");
+        }
+        userToUpdate.setName(request.getName());
+        userToUpdate.setEmail(request.getEmail());
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            userToUpdate.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        User savedUser = userRepository.save(userToUpdate);
+        return mapToResponse(savedUser);
+    }
+
+    // --- MÉTODOS AUXILIARES ---
 
     private User prepareUserEntity(UserRequest request) {
         User user = new User();
@@ -125,7 +146,7 @@ public class UserService {
     }
 
     public List<UserResponse> listOperatorsForManager(Integer carrierId) {
-        return userRepository.findByCarrierAndRole(carrierId, RoleName.ROLE_OPERATOR, LogicalStatus.ATIVO)
+        return userRepository.findAllByCarrierIdAndNotDeleted(carrierId)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

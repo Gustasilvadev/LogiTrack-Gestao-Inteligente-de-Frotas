@@ -50,4 +50,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Query("UPDATE User u SET u.logicalStatus = :status WHERE u.id = :id")
     void updateStatus(@Param("id") Integer id, @Param("status") LogicalStatus status);
+
+    @Query("SELECT u FROM User u WHERE u.carrier.id = :carrierId " +
+            "AND u.logicalStatus <> com.projeto.logitrack.enums.LogicalStatus.APAGADO")
+    List<User> findAllByCarrierIdAndNotDeleted(@Param("carrierId") Integer carrierId);
+
+    @Query("SELECT u FROM User u WHERE u.email = :email " +
+            "AND u.logicalStatus <> com.projeto.logitrack.enums.LogicalStatus.APAGADO")
+    Optional<User> findByEmailAndNotDeleted(@Param("email") String email);
 }

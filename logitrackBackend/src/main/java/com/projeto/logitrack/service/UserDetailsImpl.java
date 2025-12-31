@@ -1,6 +1,7 @@
 package com.projeto.logitrack.service;
 
 import com.projeto.logitrack.entity.User;
+import com.projeto.logitrack.enums.LogicalStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,18 +45,20 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        // O usuário só pode logar se estiver ATIVO
+        return user.getLogicalStatus() == LogicalStatus.ATIVO;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        // Se estiver INATIVO (0), APAGADO (-1), a conta está "travada"
+        return user.getLogicalStatus() != LogicalStatus.APAGADO;
     }
 
 }
