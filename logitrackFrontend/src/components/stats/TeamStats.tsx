@@ -40,26 +40,26 @@ export default function TeamStats({ users }: TeamStatsProps) {
   return (
     <Grid container spacing={3} sx={{ mb: 4 }} alignItems="stretch">
       {stats.map((stat, index) => (
-        <Grid size={{ xs: 12, sm: 4 }} key={index} sx={{ display: 'flex' }}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2.5,
-              borderRadius: 3,
-              border: '1px solid',
-              borderColor: 'divider',
-              display: 'flex',
-              alignItems: 'center',
-              width: '100%',
-              height: '100%',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 10px 20px rgba(0,0,0,0.05)',
-                borderColor: stat.color,
-              },
-            }}
-          >
+      <Grid size={{sm: 12, lg: 4 }} key={index} sx={{display: 'flex'}}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2.5,
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'divider',
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-4px)',
+              boxShadow: '0 10px 20px rgba(0,0,0,0.05)',
+              borderColor: stat.color,
+            },
+          }}
+        >
             <Avatar
               sx={{
                 bgcolor: stat.bgColor,
@@ -74,10 +74,10 @@ export default function TeamStats({ users }: TeamStatsProps) {
             </Avatar>
 
             <Box>
-              <Typography 
-                variant="subtitle2" 
-                sx={{ 
-                  color: 'text.secondary', 
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  color: 'text.secondary',
                   fontWeight: 600,
                   fontSize: '0.75rem',
                   textTransform: 'uppercase',
@@ -87,10 +87,10 @@ export default function TeamStats({ users }: TeamStatsProps) {
               >
                 {stat.label}
               </Typography>
-              <Typography 
-                variant="h4" 
-                sx={{ 
-                  fontWeight: 800, 
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 800,
                   color: 'text.primary',
                   lineHeight: 1
                 }}

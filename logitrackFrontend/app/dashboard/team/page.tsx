@@ -122,8 +122,6 @@ export default function TeamPage() {
             }
           };
 
-          
-  
           return (
             <Stack direction="row" spacing={1} sx={{ height: '100%', alignItems: 'center' }}>
               <Button 
@@ -163,36 +161,36 @@ export default function TeamPage() {
   return (
        <Box sx={{ width: '100%', p: 2 }}>
         <Stack 
-          direction="row" 
+          direction={{ xs: 'column', sm: 'row' }} 
           justifyContent="space-between" 
-          alignItems="center" 
+          alignItems={{ xs: 'flex-start', sm: 'center' }} 
+          spacing={2}
           sx={{ mb: 3 }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 'bold', m: 0 }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold'}}>
             Gestão de equipe
           </Typography>
 
-          <TeamStats users={rows} />
-
           <Button 
-            variant="contained" 
+            variant="contained"
             color="primary" 
             onClick={() => setIsModalOpen(true)} 
             sx={{ 
               borderRadius: 0, 
               fontWeight: 'bold', 
               px: 4, 
-              py: 1.2
+              py: 1.5,
             }}
           >
             CRIAR OPERADOR
           </Button>
         </Stack>
-
+        <Box sx={{ width: '100%', mb: 4 }}>
+          <TeamStats users={rows} />
+        </Box>
         <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems="center">
     
-            {/* Barra de Pesquisa */}
             <TextField
               fullWidth
               size="small"
@@ -202,7 +200,6 @@ export default function TeamPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
 
-            {/* Checkboxes de Status */}
             <FormGroup row sx={{ minWidth: 'fit-content' }}>
               <FormControlLabel
                 control={
@@ -238,7 +235,6 @@ export default function TeamPage() {
             overflow: 'hidden'
           }}
         >
-          {/* COMPONENTE DO MODAL */}
           <CreateOperatorModal 
           open={isModalOpen} 
           handleClose={() => setIsModalOpen(false)} 
@@ -247,13 +243,13 @@ export default function TeamPage() {
 
           <EditUserModal 
             open={isEditModalOpen} 
-            user={userToEdit} // Passa o usuário selecionado na linha
+            user={userToEdit}
             handleClose={() => {
               setIsEditModalOpen(false);
               setUserToEdit(null);
             }} 
             onSuccess={() => {
-              fetchTeam(); // Atualiza a tabela
+              fetchTeam();
               setToast({
                 open: true,
                 message: "Operador atualizado com sucesso!",
@@ -262,8 +258,6 @@ export default function TeamPage() {
             }} 
           />
 
-
-        {/* TOAST */}
         <Snackbar 
           open={toast.open} 
           autoHideDuration={4000} 
