@@ -2,13 +2,12 @@
 
 import CreateOperatorModal from "@/src/components/forms/CreateOperatorModal";
 import TeamStats from "@/src/components/stats/TeamStats";
+import TeamTable from "@/src/components/table/TeamTable";
 import { userService } from "@/src/services/userService/userService";
 import { UserResponse } from "@/src/types/user";
-import { Alert, Box, Button, Checkbox, Chip, FormControlLabel, FormGroup, IconButton, Paper, Snackbar, Stack, TextField, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup, Paper, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import EditIcon from '@mui/icons-material/Edit';
 import EditUserModal from "@/src/components/forms/EditUserModal";
 
 export default function TeamPage() {
@@ -69,94 +68,6 @@ export default function TeamPage() {
       return matchesSearch && matchesStatus;
     });
   }, [rows, searchTerm, showActive, showInactive]);
-
-   const columns = useMemo<GridColDef<UserResponse>[]>(() => [
-      { field: 'name', headerName: 'NOME', width: 300, align: 'center', headerAlign: 'center' },
-      { 
-        field: 'roleName', 
-        headerName: 'CARGO', 
-        width: 200,
-        align: 'center',
-        display: 'flex',
-        headerAlign: 'center',
-        renderCell: (params) => (
-          <Typography sx={{ fontSize: '0.9rem' }}>
-            {params.value?.replace('ROLE_', '')}
-          </Typography>
-        )
-      },
-      { field: 'carrierName', headerName: 'TRANSPORTADORA', width: 350, align: 'center', headerAlign: 'center'  },
-      {
-        field: 'logicalStatus',
-        headerName: 'STATUS',
-        width: 350,
-        align: 'center',
-        headerAlign: 'center',
-        renderCell: (params: GridRenderCellParams<UserResponse, string>) => {
-          const status = String(params.value || '').toUpperCase();
-          return (
-            <Chip
-              label={status} 
-              size="small"
-              sx={{ borderRadius: 0, fontWeight: 'bold', minWidth: '90px', color: '#fff' }}
-              color={status === 'ATIVO' ? 'success' : 'warning'}
-            />
-          );
-        },
-      },
-      {
-        field: 'actions',
-        headerName: 'AÇÕES',
-        width: 300,
-        sortable: false,
-        align: 'center',
-        headerAlign: 'center',
-        renderCell: (params: GridRenderCellParams<UserResponse>) => {
-          const handleStatusChange = async (newStatus: string) => {
-            try {
-              await userService.updateStatusLogical(params.row.id, newStatus);
-              fetchTeam();
-            } catch (error) {
-              console.error("Erro ao atualizar status:", error);
-              alert("Não foi possível atualizar o status.");
-            }
-          };
-
-          return (
-            <Stack direction="row" spacing={1} sx={{ height: '100%', alignItems: 'center' }}>
-              <Button 
-                variant="outlined" size="medium" color="success"
-                onClick={() => handleStatusChange('ATIVO')}
-                sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"green", color:"white"} }}
-              >
-                Ativar
-              </Button>
-              <Button 
-                variant="outlined" size="medium" color="warning"
-                onClick={() => handleStatusChange('INATIVO')}
-                sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"orange", color:"white"} }}
-              >
-                Inativar
-              </Button>
-              <Button 
-                variant="outlined" size="medium" color="error"
-                onClick={() => handleStatusChange('APAGADO')}
-                sx={{ borderRadius: 0, fontSize: '12px', fontWeight: 'bold', '&:hover':{backgroundColor:"red", color:"white"} }}
-              >
-                Apagar
-              </Button>
-
-              <IconButton onClick={() => {
-                setUserToEdit(params.row);
-                setIsEditModalOpen(true);
-              }}>
-                <EditIcon color="primary" />
-              </IconButton>
-            </Stack>
-          );
-        }
-      }
-    ], [fetchTeam]);
 
   return (
        <Box sx={{ width: '100%', p: 2 }}>
@@ -239,24 +150,24 @@ export default function TeamPage() {
           open={isModalOpen} 
           handleClose={() => setIsModalOpen(false)} 
           onSuccess={handleSuccess} 
-          />
+        />
 
-          <EditUserModal 
-            open={isEditModalOpen} 
-            user={userToEdit}
-            handleClose={() => {
-              setIsEditModalOpen(false);
-              setUserToEdit(null);
-            }} 
-            onSuccess={() => {
-              fetchTeam();
-              setToast({
-                open: true,
-                message: "Operador atualizado com sucesso!",
-                severity: "success",
-              });
-            }} 
-          />
+        <EditUserModal 
+          open={isEditModalOpen} 
+          user={userToEdit}
+          handleClose={() => {
+            setIsEditModalOpen(false);
+            setUserToEdit(null);
+          }} 
+          onSuccess={() => {
+            fetchTeam();
+            setToast({
+              open: true,
+              message: "Operador atualizado com sucesso!",
+              severity: "success",
+            });
+          }} 
+        />
 
         <Snackbar 
           open={toast.open} 
@@ -268,36 +179,16 @@ export default function TeamPage() {
             {toast.message}
           </Alert>
         </Snackbar>
-        
-          <DataGrid
-            rows={filteredRows}
-            columns={columns}
-            loading={loading}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[5, 10, 20]}
-            disableRowSelectionOnClick
-            getRowId={(row) => row.id} 
-            sx={{
-              border: 0,
-              '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: '#f5f5f5',
-                textTransform: 'uppercase',
-                fontSize: '0.75rem',
-                fontWeight: 'bold',
-                borderBottom: '2px solid #e0e0e0',
-              },
-              '& .MuiDataGrid-cell': {
-                borderBottom: '1px solid #f0f0f0',
-              },
-              '& .MuiDataGrid-cell:focus': {
-                outline: 'none',
-              },
-            }}
-          />
+
+        <TeamTable
+          filteredRows={filteredRows}
+          loading={loading}
+          onEditClick={(user) => {
+            setUserToEdit(user);
+            setIsEditModalOpen(true);
+          }}
+          onFetchTeam={fetchTeam}
+        />
       </Paper>
     </Box>
   );
