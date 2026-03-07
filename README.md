@@ -186,14 +186,8 @@ Auditoria e histórico.
 ### Passos
 1. **Clone o repositório**
    ```bash
-    git clone [https://github.com/seu-usuario/LogiTrack.git](https://github.com/seu-usuario/LogiTrack.git)
+    git clone https://github.com/Gustasilvadev/LogiTrack-Gestao-Inteligente-de-Frotas.git
 
     npm install
 
     npm run dev
-
-
-
-
-
-
