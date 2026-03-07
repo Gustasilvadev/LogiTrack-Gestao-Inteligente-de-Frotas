@@ -1,6 +1,6 @@
 "use client";
 
-import { userService } from "@/src/services/userService/userService";
+import { useUpdateUser } from "@/src/hooks/useUsers";
 import { UserRequest, UserResponse } from "@/src/types/user";
 import { Alert, Box, Button, Modal, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -35,8 +35,7 @@ export default function EditUserModal({ open, handleClose, onSuccess, user }: Ed
     };
 
     const [formData, setFormData] = useState<UserRequest>(initialForm);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const { mutate: updateUser, isPending, error } = useUpdateUser();
     
 
     useEffect(() => {
@@ -51,22 +50,18 @@ export default function EditUserModal({ open, handleClose, onSuccess, user }: Ed
         }
     }, [user, open]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         if (!user) return;
-        try {
-        setLoading(true);
-        setError(null);
-        
-        await userService.updateUser(user.id, formData);
-    
-        onSuccess();
-        handleClose();
-        } catch (err: any) {
-            const apiError = err.response?.data?.message || "Erro ao atualizar operador.";
-        setError(apiError);
-        } finally {
-            setLoading(false);
-        }
+
+        updateUser(
+          { id: user.id, userData: formData },
+          {
+            onSuccess: () => {
+              onSuccess();
+              handleClose();
+            },
+          }
+        );
     };
 
     return (
@@ -76,7 +71,7 @@ export default function EditUserModal({ open, handleClose, onSuccess, user }: Ed
           Editar Usuário: {user?.name}
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{(error as any).message || "Erro ao atualizar operador."}</Alert>}
 
         <Stack spacing={2}>
           <TextField
@@ -102,9 +97,9 @@ export default function EditUserModal({ open, handleClose, onSuccess, user }: Ed
             <Button
               fullWidth variant="contained"
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={isPending}
             >
-              {loading ? "Salvando..." : "Salvar Alterações"}
+              {isPending ? "Salvando..." : "Salvar Alterações"}
             </Button>
             
             <Button 

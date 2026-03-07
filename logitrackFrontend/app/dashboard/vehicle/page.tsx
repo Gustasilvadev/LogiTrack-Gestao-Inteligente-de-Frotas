@@ -1,31 +1,13 @@
 "use client";
 
-import { vehicleService } from "@/src/services/vehicleService/vehicleService";
-import { VehicleResponse } from "@/src/types/vehicle";
+import { useVehicles } from "@/src/hooks/useVehicles";
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function VehiclePage() {
 
-    const [rows, setRows] = useState<VehicleResponse[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { data: rows = [], isLoading: loading } = useVehicles();
     const [isModalOpen, setIsModalOpen] = useState(false);
-  
-    const fetchTeam = useCallback(async () => {
-        try {
-          setLoading(true);
-          const data = await vehicleService.listAll();
-          setRows(data);
-        } catch (error) {
-          console.error("Erro ao buscar o veiculo:", error);
-        } finally {
-          setLoading(false);
-        }
-    }, []);
-    
-    useEffect(() => {
-      fetchTeam();
-    }, [fetchTeam]);
 
   return (
         <Box sx={{ width: '100%', p: 2 }}>

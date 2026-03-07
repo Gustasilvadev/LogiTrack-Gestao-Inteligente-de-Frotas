@@ -3,17 +3,16 @@
 import CreateOperatorModal from "@/src/components/forms/CreateOperatorModal";
 import TeamStats from "@/src/components/stats/TeamStats";
 import TeamTable from "@/src/components/table/TeamTable";
-import { userService } from "@/src/services/userService/userService";
+import { useUserTeam } from "@/src/hooks/useUsers";
 import { UserResponse } from "@/src/types/user";
 import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup, Paper, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import React from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import EditUserModal from "@/src/components/forms/EditUserModal";
 
 export default function TeamPage() {
 
-  const [rows, setRows] = useState<UserResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rows = [], isLoading: loading, refetch } = useUserTeam();
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,30 +29,13 @@ export default function TeamPage() {
     });
   
     const handleSuccess = () => {
-      fetchTeam();
+      refetch();
       setToast({
         open: true,
         message: "Operador cadastrado com sucesso!",
         severity: "success",
       });
     };
-
-  // Função para carregar os dados
-  const fetchTeam = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await userService.listTeam();
-      setRows(data);
-    } catch (error) {
-      console.error("Erro ao buscar equipe:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTeam();
-  }, [fetchTeam]);
 
   const filteredRows = useMemo(() => {
     return rows.filter((user) => {
@@ -160,7 +142,6 @@ export default function TeamPage() {
             setUserToEdit(null);
           }} 
           onSuccess={() => {
-            fetchTeam();
             setToast({
               open: true,
               message: "Operador atualizado com sucesso!",
@@ -187,7 +168,6 @@ export default function TeamPage() {
             setUserToEdit(user);
             setIsEditModalOpen(true);
           }}
-          onFetchTeam={fetchTeam}
         />
       </Paper>
     </Box>

@@ -1,5 +1,5 @@
 import { UserResponse } from "@/src/types/user";
-import { userService } from "@/src/services/userService/userService";
+import { useUpdateUserStatus } from "@/src/hooks/useUsers";
 import { Chip, IconButton, Stack, Typography, Button, Paper } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import React, { useMemo } from "react";
@@ -9,15 +9,15 @@ interface TeamTableProps {
   filteredRows: UserResponse[];
   loading: boolean;
   onEditClick: (user: UserResponse) => void;
-  onFetchTeam: () => Promise<void>;
 }
 
 export default function TeamTable({ 
   filteredRows, 
   loading, 
-  onEditClick, 
-  onFetchTeam 
+  onEditClick
 }: TeamTableProps) {
+
+  const { mutate: updateUserStatus } = useUpdateUserStatus();
 
   const columns = useMemo<GridColDef<UserResponse>[]>(() => [
     { field: 'name', headerName: 'NOME', width: 300, align: 'center', headerAlign: 'center' },
@@ -61,14 +61,8 @@ export default function TeamTable({
       align: 'center',
       headerAlign: 'center',
       renderCell: (params: GridRenderCellParams<UserResponse>) => {
-        const handleStatusChange = async (newStatus: string) => {
-          try {
-            await userService.updateStatusLogical(params.row.id, newStatus);
-            await onFetchTeam();
-          } catch (error) {
-            console.error("Erro ao atualizar status:", error);
-            alert("Não foi possível atualizar o status.");
-          }
+        const handleStatusChange = (newStatus: string) => {
+          updateUserStatus({ id: params.row.id, status: newStatus });
         };
 
         return (
@@ -104,7 +98,7 @@ export default function TeamTable({
         );
       }
     }
-  ], [onFetchTeam, onEditClick]);
+  ], [updateUserStatus, onEditClick]);
 
   return (
     <Paper 

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Modal, TextField, Stack, Alert } from '@mui/material';
 import { UserRequest } from '@/src/types/user';
-import { userService } from '@/src/services/userService/userService';
+import { useCreateManager } from '@/src/hooks/useUsers';
 
 const formatCNPJ = (value: string) => {
   const digits = value.replace(/\D/g, "");
@@ -44,29 +44,21 @@ interface CreateUserModalProps {
     };
 
     const [formData, setFormData] = useState<UserRequest>(initialForm);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const { mutate: createManager, isPending, error } = useCreateManager();
   
-    const handleSubmit = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const payload = {
-            ...formData,
-                roleName: formData.roleName 
-            };
+    const handleSubmit = () => {
+        const payload = {
+          ...formData,
+          roleName: formData.roleName 
+        };
 
-            await userService.createManager(payload);
+        createManager(payload, {
+          onSuccess: () => {
             onSuccess();
             setFormData(initialForm);
             handleClose();
-        } catch (err: any) {
-            const apiError = err.response?.data?.message || "Erro ao salvar usuário.";
-            setError(apiError); 
-            console.error("Erro detalhado:", err.response?.data);
-        } finally {
-            setLoading(false);
-        }
+          },
+        });
     };
 
     return (
@@ -76,7 +68,7 @@ interface CreateUserModalProps {
             Novo Usuário (Gerente)
             </Typography>
 
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{(error as any).message || "Erro ao salvar usuário."}</Alert>}
 
             <Stack spacing={2}>
                 <TextField
@@ -114,9 +106,9 @@ interface CreateUserModalProps {
                     <Button
                         fullWidth variant="contained"
                         onClick={handleSubmit}
-                        disabled={loading}
+                        disabled={isPending}
                     >
-                        {loading ? "Salvando..." : "Confirmar Cadastro"}
+                        {isPending ? "Salvando..." : "Confirmar Cadastro"}
                     </Button>
                     
                     <Button 

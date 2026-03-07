@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Box, Chip, Paper, Typography, Stack, Button, Snackbar, Alert } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { userService } from "@/src/services/userService/userService";
+import { userService } from "@/src/services/userService";
 import { UserResponse } from "@/src/types/user";
 import CreateUserModal from "@/src/components/forms/CreateUserModal";
 

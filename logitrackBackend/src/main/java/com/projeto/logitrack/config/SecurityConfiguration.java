@@ -62,7 +62,7 @@ public class SecurityConfiguration {
     public static final String[] ENDPOINTS_OPERATOR = {
             "/api/vehicles/listVehicles",
             "/api/vehicles/listVehicleById/**",
-            "/api/vehicles/updateVehicleStatusById/**",
+            "/api/vehicles/updateVehicleById/**",
             "/api/history/listHistoryByCarrier",
             "/api/carriers/myCarrier"
     };

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Grid } from '@mui/material';
 import { Box, Paper, Typography, TextField, Button, Container, Link, Alert } from '@mui/material';
-import { authService } from '@/src/services/auth/auth';
+import { authService } from '@/src/services/auth';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -20,30 +20,40 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Faz o login e recebe os dados (Token, Nome, Email, Role)
       const response = await authService.login({ email, password });
+      console.log("RESPOSTA DO LOGIN:", response);
+      if (!response || !response.token) {
+         throw new Error("Token não recebido");
+      }
 
-      // 2. Persistência: Guardamos o objeto completo para usar no Dashboard
       localStorage.setItem('@LogiTrack:user', JSON.stringify({
         name: response.name,
         email: response.email,
         roleName: response.roleName 
       }));
 
-      // 3. Lógica  de Redirecionamento
-      if (response.email === 'admin@logitrack.com' && response.roleName === 'ADMIN') {
+      // --- LÓGICA DE REDIRECIONAMENTO
+      const role = response.roleName;
+
+      if (response.email === 'admin@logitrack.com' && role === 'ADMIN') {
+        console.log("Redirecionando para Admin...");
         router.push('/dashboardAdmin/dashCarriers');
-      } else if (response.roleName === 'MANAGER' || response.roleName === 'OPERADOR') {
+      } 
+      else if (role === 'MANAGER' || role === 'OPERATOR') {
+        console.log("Redirecionando para Dashboard...");
         router.push('/dashboard/home');
+      } 
+      else {
+        console.warn("Role não reconhecida ou login genérico. Redirecionando para home."); 
       }
 
-      } catch (err: any) {
-        setError('E-mail ou senha inválidos.');
-        console.error('Login error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    } catch (err: any) {
+      setError('E-mail ou senha inválidos.');
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box

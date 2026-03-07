@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Alert, Box, Button, Chip, Paper, Snackbar, Stack, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { carrierService } from "@/src/services/carrierService/carrierService";
+import { carrierService } from "@/src/services/carrierService";
 import { CarrierResponse } from "@/src/types/carrier";
 import CreateCarrierModal from "@/src/components/forms/CreateCarrierModal";
 

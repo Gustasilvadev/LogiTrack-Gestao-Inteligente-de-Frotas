@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Box, Button, Typography, Modal, TextField, Stack, Alert } from '@mui/material';
-import { carrierService } from "@/src/services/carrierService/carrierService";
+import { useCreateCarrier } from "@/src/hooks/useCarriers";
 import { CarrierRequest } from '@/src/types/carrier';
 
 const style = {
@@ -36,31 +36,27 @@ interface CreateCarrierModalProps {
 export default function CreateCarrierModal({ open, handleClose, onSuccess }: CreateCarrierModalProps) {
   const initialForm: CarrierRequest = { name: '', cnpj: '' };
   const [formData, setFormData] = useState<CarrierRequest>(initialForm);
-  
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
 
- const handleSubmit = async () => {
+  const { mutate: createCarrier, isPending, error } = useCreateCarrier();
+
+ const handleSubmit = () => {
     if (formData.name.trim().length < 3) {
-      setError("O nome deve ter pelo menos 3 caracteres.");
+      setLocalError("O nome deve ter pelo menos 3 caracteres.");
       return;
     }
 
-    try {
-      setLoading(true);
-      setError(null);
-      
-      await carrierService.create(formData);
-      onSuccess();
-      setFormData(initialForm);
-      onSuccess();
-      handleClose();
-    } catch (err) {
-      console.error("Erro ao criar transportadora", err);
-      setError("Falha ao salvar. Verifique se o CNPJ já está cadastrado.");
-    } finally {
-      setLoading(false);
-    }
+    setLocalError(null);
+    createCarrier(formData, {
+      onSuccess: () => {
+        onSuccess();
+        setFormData(initialForm);
+        handleClose();
+      },
+      onError: () => {
+        setLocalError("Falha ao salvar. Verifique se o CNPJ já está cadastrado.");
+      },
+    });
   };
 
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +71,7 @@ export default function CreateCarrierModal({ open, handleClose, onSuccess }: Cre
           Nova Transportadora
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {(error || localError) && <Alert severity="error" sx={{ mb: 2 }}>{localError || (error as any).message}</Alert>}
 
         <Stack spacing={2.5}>
           <TextField
@@ -102,9 +98,9 @@ export default function CreateCarrierModal({ open, handleClose, onSuccess }: Cre
                 fullWidth
                 variant="contained" 
                 onClick={handleSubmit}
-                disabled={formData.name.length < 3 || formData.cnpj.length < 18}
+                disabled={formData.name.length < 3 || formData.cnpj.length < 18 || isPending}
             >
-                Confirmar Cadastro
+                {isPending ? "Salvando..." : "Confirmar Cadastro"}
             </Button>
             
             <Button 

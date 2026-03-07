@@ -1,28 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMyCarrier } from "@/src/hooks/useCarriers";
 import { Box, Paper, Typography, Stack, Chip, Divider, CircularProgress } from "@mui/material";
 import BusinessIcon from '@mui/icons-material/Business';
-import { CarrierResponse } from "@/src/types/carrier";
-import { carrierService } from "@/src/services/carrierService/carrierService";
 
 export default function CarrierPage() {
-  const [carrier, setCarrier] = useState<CarrierResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadCarrier() {
-      try {
-        const data = await carrierService.getMyCarrier();
-        setCarrier(data);
-      } catch (error) {
-        console.error("Erro ao carregar transportadora:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadCarrier();
-  }, []);
+  const { data: carrier, isLoading: loading } = useMyCarrier();
 
   if (loading) return <CircularProgress sx={{ m: 5 }} />;
   if (!carrier) return <Typography>Transportadora não encontrada.</Typography>;

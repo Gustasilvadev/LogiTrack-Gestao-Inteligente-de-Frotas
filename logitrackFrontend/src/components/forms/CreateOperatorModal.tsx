@@ -2,10 +2,8 @@
 
 import React, { useState } from 'react';
 import { Box, Button, Typography, Modal, TextField, Stack, Alert } from '@mui/material';
-import { carrierService } from "@/src/services/carrierService/carrierService";
-import { CarrierRequest } from '@/src/types/carrier';
 import { UserRequest } from '@/src/types/user';
-import { userService } from '@/src/services/userService/userService';
+import { useCreateOperator } from '@/src/hooks/useUsers';
 
 const style = {
   position: 'absolute',
@@ -45,29 +43,21 @@ export default function CreateOperatorModal({ open, handleClose, onSuccess }: Cr
     };
 
   const [formData, setFormData] = useState<UserRequest>(initialForm);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { mutate: createOperator, isPending, error } = useCreateOperator();
 
  const handleSubmit = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const payload = {
-            ...formData,
-            roleName: formData.roleName 
-            };
+    const payload = {
+      ...formData,
+      roleName: formData.roleName 
+    };
 
-            await userService.createOperator(payload);
-            onSuccess();
-            setFormData(initialForm);
-            handleClose();
-        } catch (err: any) {
-            const apiError = err.response?.data?.message || "Erro ao salvar operador.";
-            setError(apiError); 
-            console.error("Erro detalhado:", err.response?.data);
-        } finally {
-            setLoading(false);
-        }
+    createOperator(payload, {
+      onSuccess: () => {
+        onSuccess();
+        setFormData(initialForm);
+        handleClose();
+      },
+    });
     };
 
 
@@ -78,7 +68,7 @@ export default function CreateOperatorModal({ open, handleClose, onSuccess }: Cr
               Novo Usuário (Operador)
               </Typography>
   
-              {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+              {error && <Alert severity="error" sx={{ mb: 2 }}>{(error as any).message || "Erro ao salvar operador."}</Alert>}
   
               <Stack spacing={2}>
                   <TextField
@@ -110,9 +100,9 @@ export default function CreateOperatorModal({ open, handleClose, onSuccess }: Cr
                       <Button
                           fullWidth variant="contained"
                           onClick={handleSubmit}
-                          disabled={loading}
+                          disabled={isPending}
                       >
-                          {loading ? "Salvando..." : "Confirmar Cadastro"}
+                          {isPending ? "Salvando..." : "Confirmar Cadastro"}
                       </Button>
                       
                       <Button 

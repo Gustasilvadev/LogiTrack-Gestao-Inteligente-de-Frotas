@@ -40,7 +40,7 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleService.findById(id, userDetails.getUser().getCarrier().getId()));
     }
 
-    @PutMapping("/updateVehicleStatusById/{id}")
+    @PutMapping("/updateVehicleById/{id}")
     public ResponseEntity<VehicleResponse> updateStatus(@PathVariable Integer id,
                                                         @RequestBody VehicleRequest request,
                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
