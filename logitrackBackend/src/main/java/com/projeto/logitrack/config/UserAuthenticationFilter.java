@@ -31,6 +31,10 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        if (request.getRequestURI().equals("/api/users/loginUser")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String token = recoveryToken(request);
 
         if (token != null) {

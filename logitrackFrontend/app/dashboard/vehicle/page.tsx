@@ -1,13 +1,48 @@
 "use client";
 
+import VehicleStats from "@/src/components/stats/VehicleStats";
+import VehicleTable from "@/src/components/table/VehicleTable";
 import { useVehicles } from "@/src/hooks/useVehicles";
-import { Box, Button, Stack, Typography } from "@mui/material";
-import { useState } from "react";
+import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup, Paper, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { useMemo, useState } from "react";
 
 export default function VehiclePage() {
 
     const { data: rows = [], isLoading: loading } = useVehicles();
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showActive, setShowActive] = useState(true);
+    const [showInactive, setShowInactive] = useState(true);
+
+    const [toast, setToast] = useState({
+      open: false,
+      message: "",
+      severity: "success" as "success" | "error",
+    });
+  
+    // const handleSuccess = () => {
+    //   refetch();
+    //   setToast({
+    //     open: true,
+    //     message: "Veículo cadastrado com sucesso!",
+    //     severity: "success",
+    //   });
+    // };
+
+    const filteredRows = useMemo(() => {
+      return rows.filter((vehicle) => {
+        const matchesSearch = 
+          vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) || 
+          vehicle.plate.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = 
+          (showActive && vehicle.logicalStatus === 'ATIVO') || 
+          (showInactive && vehicle.logicalStatus === 'INATIVO');
+  
+        return matchesSearch && matchesStatus;
+      });
+    }, [rows, searchTerm, showActive, showInactive]);
 
   return (
         <Box sx={{ width: '100%', p: 2 }}>
@@ -37,8 +72,96 @@ export default function VehiclePage() {
             </Button>
           </Stack>
           <Box sx={{ width: '100%', mb: 4 }}>
-            {/* Adicionar cards estatisticos do veiculo */}
+            <VehicleStats vehicles={rows} />
           </Box>
+          <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems="center">
+      
+              <TextField
+                fullWidth
+                size="small"
+                label="Pesquisar pelo modelo ou placa"
+                variant="outlined"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+  
+              <FormGroup row sx={{ minWidth: 'fit-content' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox 
+                      checked={showActive} 
+                      onChange={(e) => setShowActive(e.target.checked)} 
+                      color="success"
+                    />
+                  }
+                  label="Ativos"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox 
+                      checked={showInactive} 
+                      onChange={(e) => setShowInactive(e.target.checked)} 
+                      color="warning"
+                    />
+                  }
+                  label="Inativos"
+                />
+              </FormGroup>
+            </Stack>
+          </Paper>
+          <Paper 
+            sx={{ 
+              height: 600, 
+              width: '100%', 
+              borderRadius: 0, 
+              boxShadow: 'none', 
+              border: '1px solid #e0e0e0',
+              overflow: 'hidden'
+            }}
+          >
+            {/* <CreateOperatorModal 
+            open={isModalOpen} 
+            handleClose={() => setIsModalOpen(false)} 
+            onSuccess={handleSuccess} 
+          />
+  
+          <EditUserModal 
+            open={isEditModalOpen} 
+            user={userToEdit}
+            handleClose={() => {
+              setIsEditModalOpen(false);
+              setUserToEdit(null);
+            }} 
+            onSuccess={() => {
+              setToast({
+                open: true,
+                message: "Operador atualizado com sucesso!",
+                severity: "success",
+              });
+            }} 
+          /> */}
+  
+          <Snackbar 
+            open={toast.open} 
+            autoHideDuration={4000} 
+            onClose={() => setToast({ ...toast, open: false })}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert variant="filled" severity={toast.severity} sx={{ borderRadius: 0 }}>
+              {toast.message}
+            </Alert>
+          </Snackbar>
+  
+          <VehicleTable
+            filteredRows={filteredRows}
+            loading={loading}
+            onEditClick={(user) => {
+              //setUserToEdit(user);
+              //setIsEditModalOpen(true);
+            }}
+          />
+        </Paper>
         </Box>
   );
 }
